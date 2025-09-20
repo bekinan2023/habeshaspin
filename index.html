@@ -1,146 +1,565 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>Truth or Dare</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#0f1724;color:#f0f6ff;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:10px}
-.page{display:none;width:100%;max-width:500px;padding:20px;background:#162338;border-radius:16px;box-shadow:0 4px 12px rgba(0,0,0,.6);animation:fade .3s ease-in-out}
-.page.active{display:block}
-h1{font-size:clamp(18px,5vw,24px);margin-bottom:16px;text-align:center}
-p{text-align:center;font-size:clamp(14px,4vw,16px);}
-button{width:100%;padding:14px;margin:8px 0;background:#06b6d4;color:#001219;border:none;border-radius:12px;cursor:pointer;font-weight:bold;font-size:clamp(14px,4vw,16px);transition:.2s}
-button:hover{background:#0891b2}
-button:active{transform:scale(.97)}
-.result{padding:16px;margin:16px 0;background:#1e2a44;border-radius:12px;text-align:center;font-size:clamp(14px,4vw,16px)}
-@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-</style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Harar Truth or Dare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Styles */
+        :root {
+            --bg-color: #F8F0F0;
+            --card-bg: #FFFFFF;
+            --primary-color: #D32F2F;
+            --secondary-color: #424242;
+            --accent-color: #FFC107;
+            --text-color: #212121;
+            --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            margin: 0;
+            /* Changed font to Cambria */
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-x: hidden;
+            text-align: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: clamp(16px, 5vw, 32px);
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--box-shadow);
+            transition: transform var(--transition-speed) ease-in-out, opacity var(--transition-speed) ease-in-out;
+            transform: translateY(10px);
+            opacity: 0;
+            display: none;
+        }
+
+        .container.active {
+            display: block;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-color);
+            z-index: 1000;
+            transition: opacity var(--transition-speed) ease-out;
+        }
+
+        .loading-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .harar-logo {
+            width: clamp(200px, 70vw, 400px);
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        /* NEW LOADING BAR STYLES */
+        .loading-bar-container {
+            width: clamp(200px, 70vw, 400px);
+            height: 30px;
+            border-radius: 15px;
+            background-color: #E0E0E0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading-bar {
+            height: 100%;
+            width: 0;
+            background-color: var(--primary-color);
+            transition: width 2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            position: relative;
+            border-radius: 15px;
+        }
+
+        .loading-logo {
+            height: 90%;
+            width: auto;
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Elements */
+        h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(28px, 7vw, 48px);
+            text-align: center;
+            margin-bottom: clamp(8px, 4vw, 16px);
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        p {
+            font-size: clamp(16px, 4vw, 18px);
+            text-align: center;
+            color: var(--secondary-color);
+            margin-bottom: clamp(16px, 5vw, 24px);
+            line-height: 1.5;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 16px;
+            border-radius: 12px;
+            border: 1px solid #E0E0E0;
+            background-color: #FAFAFA;
+            color: var(--text-color);
+            font-size: clamp(16px, 4vw, 18px);
+            box-sizing: border-box;
+        }
+
+        input::placeholder {
+            color: #9E9E9E;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            margin-top: 10px;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: clamp(16px, 4vw, 20px);
+            transition: background-color var(--transition-speed) ease-in-out, transform 0.1s ease-in-out, box-shadow var(--transition-speed) ease-in-out;
+            box-sizing: border-box;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            background-color: #B71C1C;
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* NEW RESULT AND QUESTION BOX */
+        .result, .question-box {
+            padding: clamp(24px, 6vw, 32px);
+            margin-top: clamp(16px, 5vw, 24px);
+            background-color: #ffffff;
+            border-radius: 12px;
+            text-align: center;
+            font-size: clamp(18px, 5vw, 24px);
+            font-weight: 500;
+            border: 2px dashed var(--accent-color);
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .result p {
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .question-text {
+            /* Ensures the question text is the only child of the result box */
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            font-size: clamp(18px, 5vw, 24px);
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        @media (min-width: 480px) {
+            .button-group {
+                flex-direction: row;
+            }
+        }
+
+        .button-group button {
+            flex: 1;
+        }
+
+        .add-player-btn {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            box-shadow: none;
+        }
+
+        .add-player-btn:hover {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* NEW SPINNING PAGE STYLES */
+        #page5 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .spin-image {
+            width: clamp(150px, 40vw, 250px);
+            height: auto;
+            animation: spin 1.5s infinite linear;
+        }
+
+        /* NEW SLIDESHOW STYLES */
+        #slideshowContainer {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 500px;
+            padding: 10px;
+            box-sizing: border-box;
+            text-align: center;
+            display: none; /* Initially hidden */
+        }
+        #slideshowImage {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+            animation: fade 2s ease-in-out;
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes fade {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* New Warning Image Style */
+        .warning-image {
+            width: 80px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
 
-<!-- Page 1: Welcome -->
-<div id="page1" class="page active">
-  <h1 id="welcomeText">Welcome</h1>
-  <button id="startBtn">Start Game</button>
+<div id="loadingScreen" class="loading-screen">
+    <img src="logo.png" alt="Harar Beer Logo" class="harar-logo">
+    <div class="loading-bar-container">
+        <div id="loadingBar" class="loading-bar">
+            <img src="harar.png" alt="Loading" class="loading-logo">
+        </div>
+    </div>
 </div>
 
-<!-- Page 2: Choose Truth or Dare -->
-<div id="page2" class="page">
-  <h1 id="currentPlayer">Player</h1>
-  <p>Choose:</p>
-  <button id="truthChoice">Truth</button>
-  <button id="dareChoice">Dare</button>
+<div id="page0" class="container">
+    <img src="warning.png" alt="Warning Icon" class="warning-image">
+    <h1>ማሳስቢያ</h1>
+    <p>ይህንን ጨዋታ ስንጫወት ውሸት አይፈቀድም</p>
+    <button id="continueBtn">Continue</button>
 </div>
 
-<!-- Page 3: Truth -->
-<div id="page3" class="page">
-  <h1 id="truthPlayer">Player</h1>
-  <p>Spin the wheel to get a Truth</p>
-  <button id="spinTruth">Spin Wheel</button>
-  <div id="truthResult" class="result"></div>
-  <button id="truthDone" style="display:none">Done</button>
+<div id="page1" class="container">
+    <h1>የሐረር ጨዋታ</h1>
+    <p>የሐረር ጨዋታ</p>
+    <div id="player-inputs">
+        <input type="text" id="ሙሉ ስም ያስግቡ" placeholder="በረከት ተስፋዬ">
+        <input type="text" id="ሙሉ ስም ያስግቡ" placeholder="ዮናስ ሰለሞን">
+    </div>
+    <div id="additionalPlayers"></div>
+    <button id="addPlayerBtn" class="add-player-btn" style="margin-top: 0; margin-bottom: 20px;">Add Another Player</button>
+    <button id="startBtn">Start Game</button>
 </div>
 
-<!-- Page 4: Dare -->
-<div id="page4" class="page">
-  <h1 id="darePlayer">Player</h1>
-  <p>Spin the wheel to get a Dare</p>
-  <button id="spinDare">Spin Wheel</button>
-  <div id="dareResult" class="result"></div>
-  <button id="dareDone" style="display:none">Done</button>
+<div id="page2" class="container">
+    <h1 id="currentPlayer">ተረኛ</h1>
+    <p>እውነቱን ይናገራሉ ወይስ ይቀጣሉ</p>
+    <div class="button-group">
+        <button id="truthChoice">እውነቱን እናገራለሁ</button>
+        <button id="dareChoice">ብቀጣ ይሻለኛል</button>
+    </div>
 </div>
 
-<!-- Telegram WebApp SDK -->
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@telegram/webapp@1.0.0/dist/telegram-webapp.min.js"></script>
+<div id="page3" class="container">
+    <h1 id="truthPlayer">Player</h1>
+    <p>Spin for your Truth.</p>
+    <div id="truthResult" class="result">
+        <p class="question-text">Your question will appear here after you spin!</p>
+    </div>
+    <button id="spinTruth" style="margin-top: 20px;">Spin Wheel</button>
+    <button id="truthDone" style="display:none; margin-top: 20px;">I'm Done</button>
+</div>
+
+<div id="page4" class="container">
+    <h1 id="darePlayer">Player</h1>
+    <p>Spin for your Dare.</p>
+    <div id="dareResult" class="result">
+        <p class="question-text">Your dare will appear here after you spin!</p>
+    </div>
+    <button id="spinDare" style="margin-top: 20px;">Spin Wheel</button>
+    <button id="dareDone" style="display:none; margin-top: 20px;">I'm Done</button>
+</div>
+
+<div id="page5" class="container">
+    <h1 id="spinHeader">Spinning...</h1>
+    <p>A truth or dare is being chosen for you!</p>
+    <img src="harar.png" alt="Spinning Harar Logo" class="spin-image">
+</div>
+
+<div id="slideshowContainer">
+    <img id="slideshowImage" src="b1.png" alt="Promotional Image">
+</div>
+
 <script>
-const truths=[
-  "What is your biggest fear that you’ve never told anyone?",
-  "Have you ever had a crush on someone in this room? If so, who?",
-  "What’s the most embarrassing thing you’ve ever done in public?",
-  "If you could change one thing about your life, what would it be?",
-  "What’s a secret talent you have that no one knows about?"
-];
-const dares=[
-  "Dance like nobody's watching for one minute.",
-  "Try to lick your elbow.",
-  "Speak in an accent of your choice for the next three rounds.",
-  "Text a random contact in your phone and tell them you miss them.",
-  "Do your best impression of a celebrity until someone guesses who you are."
-];
+    const allTruths = [
+        "kiss አድርገ ታውቀዋለህ/ሽ?",
+        "ከዚህ በፊት ፍቅር ይዞክ/ሽ ያውቃል አሁንስ?",
+        "ከሴት ምኗ ደስ ይልካል?",
+        "እኔና አንቺ ብቻችንን ብንሆን ምን የምነደርግ ይመስልሻል?",
+        "ማን ብየ ብጠራሽ/ክ ደስ ይልሻል/ካል?",
+        "የ ልደትሽ ቀን መቼ ነው?",
+        "ሼማኛ ነክ/ነሽ?",
+        "ለ ሴክስ ተጠይቀሽ ተውቃለሽ/ህ?",
+        "የቱ ጋ ብስምክ ደስ ይልካል",
+        "ማንም የማያውቀውን አንድ ሚስጥር  ንገረኝ/ንገሪኚ?",
+        "music ገብዛኝ/ኚ?",
+        "ምን አይነት ሰው እመስልካለሁ ?",
+        "ስንት ለጆች እንዲኖሩክ ትፈልጋለህ",
+        "ፍቅር ለአንቺ ምንድነዉ",
+        "ውሎ እንደት ነበር?",
+        "ለፍቅር መስፈርት አለሽ/ክ",
+    ];
 
-let players=[];
-let currentIndex=0;
+    const allDares = [
+        "የኔን ፎቶ ለሳምንት profile አድርጊው/አድርገው",
+        "ሳሚኚ/ሳመኝ",
+        "በ chat sex እናድርግ",
+        "ዝፈን/ኚ",
+        "ተቃቅፈን ለ2 ስአት እንቀመጥ",
+        "እራት ጋብዢ",
+        "ተቃቅፈን ፊልም እንይ",
+        "ለሳምንት ፍቅረኛማቾች እንሁን",
+        "ሳልሳ ዳንስ እንደንስ",
+        "የኔን ፎቶ 1ቀን story አድርጊው/አድርገው",
+    ];
 
-// Telegram WebApp
-const tg = window.Telegram.WebApp;
+    let players = [];
+    let currentIndex = 0;
+    let truths = [...allTruths];
+    let dares = [...allDares];
 
-// Get user info
-const user = tg.initDataUnsafe.user;
-const userName = user ? (user.first_name || user.username || "Player 1") : "Player 1";
-document.getElementById("welcomeText").textContent = "Welcome, " + userName;
+    const pages = document.querySelectorAll('.container');
 
-function showPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
-}
+    function showPage(id) {
+        pages.forEach(p => p.classList.remove('active'));
+        const currentPage = document.getElementById(id);
+        currentPage.classList.add('active');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        
+        // Control slideshow visibility
+        const slideshowContainer = document.getElementById('slideshowContainer');
+        if (id === 'page5') {
+            slideshowContainer.style.display = 'none';
+        } else {
+            slideshowContainer.style.display = 'block';
+        }
+    }
 
-function pickAndRemove(arr){
-  if(arr.length===0) return null;
-  const i=Math.floor(Math.random()*arr.length);
-  return arr.splice(i,1)[0];
-}
+    function resetAndStartOver() {
+        truths = [...allTruths];
+        dares = [...allDares];
+        const additionalPlayersDiv = document.getElementById('additionalPlayers');
+        additionalPlayersDiv.innerHTML = '';
+        const playerInputsDiv = document.getElementById('player-inputs');
+        playerInputsDiv.innerHTML = '<input type="text" id="player1Name" placeholder="Player 1 Name"><input type="text" id="player2Name" placeholder="Player 2 Name">';
+        showPage('page1');
+    }
 
-// Start button
-document.getElementById('startBtn').onclick = ()=>{
-  players=[userName,"Friend"]; // first player = Telegram user
-  currentIndex=0;
-  document.getElementById('currentPlayer').textContent = players[currentIndex];
-  showPage('page2');
-}
+    function pickAndRemove(arr, originalArr) {
+        if (arr.length === 0) {
+            arr.push(...originalArr);
+            return "No more left! You've gone through them all. Starting over...";
+        }
+        const i = Math.floor(Math.random() * arr.length);
+        return arr.splice(i, 1)[0];
+    }
 
-// Truth / Dare selection
-document.getElementById('truthChoice').onclick = ()=>{
-  document.getElementById('truthPlayer').textContent = players[currentIndex];
-  document.getElementById('truthResult').textContent = '';
-  document.getElementById('truthDone').style.display = 'none';
-  showPage('page3');
-}
+    // Loading Screen and Slideshow Logic
+    document.addEventListener("DOMContentLoaded", () => {
+        const loadingScreen = document.getElementById('loadingScreen');
+        const loadingBar = document.getElementById('loadingBar');
+        const slideshowImages = ['b1.png', 'b2.png', 'b3.png', 'b4.png', 'b5.png'];
+        let currentImageIndex = 0;
+        const slideshowImage = document.getElementById('slideshowImage');
 
-document.getElementById('dareChoice').onclick = ()=>{
-  document.getElementById('darePlayer').textContent = players[currentIndex];
-  document.getElementById('dareResult').textContent = '';
-  document.getElementById('dareDone').style.display = 'none';
-  showPage('page4');
-}
+        setTimeout(() => {
+            loadingBar.style.width = '100%';
+        }, 100);
 
-// Spin wheel
-document.getElementById('spinTruth').onclick = ()=>{
-  const item = pickAndRemove(truths) || 'No more truths left.';
-  document.getElementById('truthResult').textContent = item;
-  document.getElementById('truthDone').style.display = 'block';
-}
+        setTimeout(() => {
+            loadingScreen.classList.add('fade-out');
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                showPage('page0'); // Show the new warning page first
+                
+                // Start the slideshow after 5 seconds on the main game pages
+                setTimeout(() => {
+                    const slideshowContainer = document.getElementById('slideshowContainer');
+                    slideshowContainer.style.display = 'block';
+                    
+                    setInterval(() => {
+                        currentImageIndex = (currentImageIndex + 1) % slideshowImages.length;
+                        slideshowImage.src = slideshowImages[currentImageIndex];
+                    }, 3000); // Change image every 3 seconds
+                }, 5000); // 5-second delay to start the slideshow
+                
+            }, 500);
+        }, 2100);
+    });
 
-document.getElementById('spinDare').onclick = ()=>{
-  const item = pickAndRemove(dares) || 'No more dares left.';
-  document.getElementById('dareResult').textContent = item;
-  document.getElementById('dareDone').style.display = 'block';
-}
+    // New Continue Button on page0
+    document.getElementById('continueBtn').onclick = () => {
+        showPage('page1');
+    };
 
-// Next player
-function nextPlayer(){
-  currentIndex=(currentIndex+1)%players.length;
-  document.getElementById('currentPlayer').textContent = players[currentIndex];
-  showPage('page2');
-}
+    // Add Player Button
+    document.getElementById('addPlayerBtn').onclick = () => {
+        const additionalPlayersDiv = document.getElementById('additionalPlayers');
+        const newInput = document.createElement('input');
+        const numPlayers = document.querySelectorAll('#page1 input').length;
+        newInput.type = "text";
+        newInput.placeholder = `Player ${numPlayers + 1} Name`;
+        additionalPlayersDiv.appendChild(newInput);
+    };
 
-document.getElementById('truthDone').onclick = nextPlayer;
-document.getElementById('dareDone').onclick = nextPlayer;
+    // Start Button
+    document.getElementById('startBtn').onclick = () => {
+        const playerInputs = document.querySelectorAll('#page1 input');
+        players = [];
+        playerInputs.forEach(input => {
+            const name = input.value.trim();
+            if (name) {
+                players.push(name);
+            }
+        });
+
+        if (players.length < 2) {
+            alert("You need at least two players to start the game!");
+            return;
+        }
+
+        currentIndex = 0;
+        document.getElementById('currentPlayer').textContent = `${players[currentIndex]}'s Turn`;
+        showPage('page2');
+    };
+
+    // Truth / Dare Selection
+    document.getElementById('truthChoice').onclick = () => {
+        document.getElementById('truthPlayer').textContent = `${players[currentIndex]}'s Truth`;
+        document.getElementById('truthResult').innerHTML = '<p class="question-text">Your question will appear here after you spin!</p>';
+        document.getElementById('truthDone').style.display = 'none';
+        showPage('page3');
+    };
+
+    document.getElementById('dareChoice').onclick = () => {
+        document.getElementById('darePlayer').textContent = `${players[currentIndex]}'s Dare`;
+        document.getElementById('dareResult').innerHTML = '<p class="question-text">Your dare will appear here after you spin!</p>';
+        document.getElementById('dareDone').style.display = 'none';
+        showPage('page4');
+    };
+
+    // Spin Wheel - Truth
+    document.getElementById('spinTruth').onclick = () => {
+        showPage('page5');
+        setTimeout(() => {
+            const item = pickAndRemove(truths, allTruths);
+            document.getElementById('truthResult').innerHTML = `<p class="question-text">${item}</p>`;
+            document.getElementById('truthDone').style.display = 'block';
+            showPage('page3');
+        }, 2000);
+    };
+
+    // Spin Wheel - Dare
+    document.getElementById('spinDare').onclick = () => {
+        showPage('page5');
+        setTimeout(() => {
+            const item = pickAndRemove(dares, allDares);
+            document.getElementById('dareResult').innerHTML = `<p class="question-text">${item}</p>`;
+            document.getElementById('dareDone').style.display = 'block';
+            showPage('page4');
+        }, 2000);
+    };
+
+    // Next player
+    function nextPlayer() {
+        currentIndex = (currentIndex + 1) % players.length;
+        if (currentIndex === 0) {
+            if (confirm("Everyone has had a turn. Do you want to play again?")) {
+                resetAndStartOver();
+            } else {
+                alert("Thanks for playing Harar Truth or Dare!");
+            }
+        } else {
+            document.getElementById('currentPlayer').textContent = `${players[currentIndex]}'s Turn`;
+            showPage('page2');
+        }
+    }
+
+    document.getElementById('truthDone').onclick = nextPlayer;
+    document.getElementById('dareDone').onclick = nextPlayer;
 
 </script>
 </body>
 </html>
-
